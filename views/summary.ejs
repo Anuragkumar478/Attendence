@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title><%= student.name %> Summary</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h1 { text-align: center; }
+    img { width: 100px; height: 100px; object-fit: cover; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+    section { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Student Summary - <%= student.name %></h1>
+  <p><strong>Roll Number:</strong> <%= student.rollNumber %></p>
+  <p><strong>Email:</strong> <%= student.email %></p>
+  <% if (student.profilePic) { %>
+    <img src="<%= student.profilePic %>" alt="Profile Picture">
+  <% } %>
+
+  <section>
+    <h2>Attendance</h2>
+    <ul>
+      <% attendance.forEach(item => { %>
+        <li><%= item.date.toISOString().split('T')[0] %> - <%= item.status %></li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Marks</h2>
+    <table>
+      <tr><th>Subject</th><th>Test Marks</th><th>External Marks</th></tr>
+      <% marks.forEach(mark => { %>
+        <tr>
+          <td><%= mark.subject %></td>
+          <td><%= mark.classTestMarks %></td>
+          <td><%= mark.externalMarks %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </section>
+
+  <section>
+    <h2>Lab Visits</h2>
+    <ul>
+      <% labVisits.forEach(lab => { %>
+        <li><%= lab.date.toISOString().split('T')[0] %> - <%= lab.labName %></li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <ul>
+      <% projects.forEach(p => { %>
+        <li><strong><%= p.title %></strong> - <%= p.submissionDate.toISOString().split('T')[0] %> - <%= p.link %></li>
+      <% }) %>
+    </ul>
+  </section>
+</body>
+</html>
