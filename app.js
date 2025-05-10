@@ -4,6 +4,12 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
+const Student = require('./models/Student');
+const Attendance = require('./models/Attendance');
+const Marks = require('./models/Marks');
+const LabVisit = require('./models/LabVisit');
+const Project = require('./models/Projects');
+
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +50,7 @@ app.use('/api/projects', require('./routes/project'));
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Server error');
+
 });
 
 // Set up EJS for student summary
