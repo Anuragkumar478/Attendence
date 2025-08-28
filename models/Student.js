@@ -6,8 +6,14 @@ const StudentSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePic: { type: String, default: "" },
-  class: { type: String, required: true },
-  department: { type: String, required: true },
+  year: { type: Number, required: true },
+  faceEncoding:[Number],
+  department: { 
+     type: String,  
+     enum:["CSE", "EEE", "ECE", "Mining"],
+     required: true 
+    },
+    subjects:[],
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -2,37 +2,51 @@ const Attendance = require('../models/Attendance');
 const Student = require('../models/Student');
 
 // Mark attendance
+// Mark attendance (batch)
 exports.markAttendance = async (req, res) => {
   try {
-    const { studentId, status, subject } = req.body;
-    const student = await Student.findById(studentId);
-    if (!student) return res.status(404).json({ msg: 'Student not found' });
+    const { records, subject, year, department } = req.body;
+
+    if (!records || !Array.isArray(records) || records.length === 0) {
+      return res.status(400).json({ msg: "No attendance records provided" });
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const existingAttendance = await Attendance.findOne({
-      student: studentId,
-      date: { $gte: today },
-      subject
-    });
+    let saved = [];
+    for (let record of records) {
+      const { studentId, status } = record;
 
-    if (existingAttendance) {
-      return res.status(400).json({ msg: 'Attendance already marked for today' });
+      const student = await Student.findById(studentId);
+      if (!student) continue; // skip if invalid
+
+      // Prevent duplicate marking
+      const existing = await Attendance.findOne({
+        student: studentId,
+        subject,
+        date: { $gte: today },
+      });
+
+      if (existing) continue;
+
+      const attendance = new Attendance({
+        student: studentId,
+        status,
+        subject,
+        year,
+        department,
+        markedBy: req.user.id,
+      });
+
+      await attendance.save();
+      saved.push(attendance);
     }
 
-    const attendance = new Attendance({
-      student: studentId,
-      status,
-      subject,
-      markedBy: req.user.id
-    });
-
-    await attendance.save();
-    res.json(attendance);
+    res.json({ msg: "Attendance marked", count: saved.length, data: saved });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 };
 

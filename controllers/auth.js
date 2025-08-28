@@ -2,28 +2,54 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
+const Subjects=require('../models/subjects');
+
+
+
 
 // Register Student
+// Register Student
 exports.registerStudent = async (req, res) => {
-  const { name, rollNumber, email, password, class: studentClass, department } = req.body;
-  
+  const { name, rollNumber, email, password, year, department } = req.body;
+
   try {
     let student = await Student.findOne({ email });
-    if (student) return res.status(400).json({ msg: 'Student already exists' });
+    if (student) return res.status(400).json({ msg: "Student already exists" });
 
-    student = new Student({ name, rollNumber, email, password, class: studentClass, department });
+    // ✅ fetch subjects from DB instead of hardcoding
+    const subjectDoc = await Subjects.findOne({ department, year });
+    const subjects = subjectDoc ? subjectDoc.subjects : [];
+
+     const profilePic = req.file ? `/uploads/${req.file.filename}` : "";
+
+    student = new Student({
+      name,
+      rollNumber,
+      email,
+      password,
+      year,
+      department,
+      subjects,
+       profilePic,
+    });
+
     const salt = await bcrypt.genSalt(10);
     student.password = await bcrypt.hash(password, salt);
     await student.save();
 
-    const payload = { user: { id: student.id, role: 'student' } };
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
-    });
+    const payload = { user: { id: student.id, role: "student" } };
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: "5h" },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token,student });
+      }
+    );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 };
 
