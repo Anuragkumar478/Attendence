@@ -40,3 +40,14 @@ exports.evaluateProject = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+// get project
+exports.getProject=async(req,res)=>{
+try{
+const projects=await Project.find().populate("student","rollNumber");
+res.json(projects)
+}
+catch(err){
+console.error(err.message);
+  res.status(500).send('Server error');
+}
+}

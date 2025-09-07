@@ -46,6 +46,8 @@ app.use('/api/marks', require('./routes/marks'));
 app.use('/api/labs', require('./routes/lab'));
 app.use('/api/projects', require('./routes/project'));
 app.use('/api/subjects',require('./routes/subject'));
+app.use("/api/qr-attendance", require("./routes/qrAttendance"));
+
 
 // Error handling
 app.use((err, req, res, next) => {
